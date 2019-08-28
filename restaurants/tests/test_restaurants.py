@@ -82,3 +82,15 @@ async def test_root(client: aiohttp_client) -> None:
     '''
     resp = await client.get('/')
     assert resp.status == 404
+
+
+async def test_random_restaurant(client: aiohttp_client) -> None:
+    # we can't really test randomness here without spending significant CPU time,
+    # essentially to reduce the risks of false negatives. 
+    # so we consider that "returning a restaurant without crashing" is ok.
+
+    inserted = await fillup_data(client)
+    resp = await client.get('/restaurants/random')
+    assert resp.status == 200
+    data = await resp.json()
+    assert len(data) == 1
