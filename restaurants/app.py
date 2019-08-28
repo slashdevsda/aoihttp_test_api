@@ -73,8 +73,8 @@ async def list_restaurant(request: web.Request) -> web.Response:
     '''
     list entries. This one is pretty straightforward an lacks of pagination
     '''
-    c = await request.app['db'].execute('SELECT * FROM restaurants')
-    return web.json_response(data=await c.fetchall()[0])
+    c = await request.app['db'].execute('SELECT name FROM restaurants')
+    return web.json_response(data=[i[0] for i in await c.fetchmany(200)])
 
 
 def init_app(config: Optional[List[str]] = None) -> web.Application:
