@@ -21,7 +21,7 @@ async def database_connect(app: web.Application) -> AsyncGenerator[None, None]:
     await db.close()
     
 
-def parse_and_validate_json_body(schema): # type: ignore
+def parse_and_validate_json_body(schema: Dict[str, Any]) -> Callable[..., Any]:
     '''
     adds an additional argument (data) to handler, containing 
     the result of a JSON deserialization from the request's body content.
@@ -33,7 +33,7 @@ def parse_and_validate_json_body(schema): # type: ignore
     '''
     validator = Draft4Validator(schema)
     
-    def wrapper(aiohttp_handler): # type: ignore
+    def wrapper(aiohttp_handler: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(aiohttp_handler)
         async def p_handler(request: web.Request) -> web.Response:
             try:
