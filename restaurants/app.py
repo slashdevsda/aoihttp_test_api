@@ -77,6 +77,19 @@ async def list_restaurant(request: web.Request) -> web.Response:
     return web.json_response(data=[i[0] for i in await c.fetchmany(200)])
 
 
+async def delete_restaurant(request: web.Request) -> web.Response:
+    '''
+    list entries. This one is pretty straightforward an lacks of pagination
+    '''
+    restaurant_name = request.match_info['name']
+
+    async with request.app['db'].cursor() as c:
+        await c.execute('DELETE FROM restaurants WHERE name = ?', (restaurant_name,))
+        if c.rowcount != 0:
+            return web.Response(status=200)
+    return web.Response(status=404)
+
+
 def init_app(config: Optional[List[str]] = None) -> web.Application:
     app = web.Application()    
     # init context here
@@ -86,6 +99,7 @@ def init_app(config: Optional[List[str]] = None) -> web.Application:
     # - enventual template engines
     app.router.add_route('POST', '/restaurants', add_restaurant)
     app.router.add_route('GET',  '/restaurants', list_restaurant)
-    
+    app.router.add_route('DELETE',  '/restaurants/{name}', delete_restaurant)
     app.cleanup_ctx.extend([database_connect])
     return app
+
