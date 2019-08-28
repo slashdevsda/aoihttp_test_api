@@ -1,7 +1,14 @@
 from pytest_aiohttp import aiohttp_client
 from restaurants.app import init_app
+from typing import List
 
-
+async def fillup_data(client: aiohttp_client) -> List[str]:
+    l = ['Donec vitae dolor.', 'sociis natoque penatibus et magnis',
+         'Praesent fermentum', 'Sed bibendum']
+    for name in l:
+        resp = await client.post('/restaurants', json={"name": name})
+        assert resp.status == 200
+    return l
 
 async def test_add_restaurant(client: aiohttp_client) -> None:
     
@@ -13,6 +20,14 @@ async def test_add_restaurant(client: aiohttp_client) -> None:
 
     resp = await client.post('/restaurants', json={"name": "накоплений"})
     assert resp.status == 200
+
+
+async def test_list_restaurant(client: aiohttp_client) -> None:
+    inserted = await fillup_data(client)
+    resp = await client.get('/restaurants')
+    assert resp.status == 200
+    data = await resp.json()
+    assert set(inserted).issubset(data)
 
 
 async def test_add_restaurant_invalids(client: aiohttp_client) -> None:
