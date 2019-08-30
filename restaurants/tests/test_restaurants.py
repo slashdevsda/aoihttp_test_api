@@ -11,7 +11,7 @@ async def fillup_data(client: aiohttp_client) -> List[str]:
     return l
 
 async def test_add_restaurant(client: aiohttp_client) -> None:
-    
+
     resp = await client.post('/restaurants', json={"name": "Burger King"})
     assert resp.status == 200
 
@@ -66,7 +66,7 @@ async def test_add_restaurant_invalids(client: aiohttp_client) -> None:
     # empty object
     resp = await client.post('/restaurants', json={})
     assert resp.status == 422
-    
+
     # outrageously invalid JSON
     resp = await client.post('/restaurants', json={"☃": "name"})
     assert resp.status == 422

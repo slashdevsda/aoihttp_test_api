@@ -29,7 +29,7 @@ def parse_and_validate_json_body(schema: Dict[str, Any]) -> Callable[..., Any]:
     It takes a schema (JSON schema flavored) as argument and validates the incoming
     payload against it.
 
-    If deserialization or validation fails, returns a proper http error to the client.
+    If deserialization or validation fails, returns an http error to the client.
     '''
     validator = Draft4Validator(schema)
     
@@ -101,15 +101,9 @@ async def random_restaurant(request: web.Request) -> web.Response:
 
 def init_app(config: Optional[List[str]] = None) -> web.Application:
     app = web.Application()    
-    # init context here
-    # - configuration
-    # - routes
-    # - database connexions
-    # - enventual template engines
     app.router.add_route('POST', '/restaurants', add_restaurant)
     app.router.add_route('GET',  '/restaurants', list_restaurant)
     app.router.add_route('GET',  '/restaurants/random', random_restaurant)
     app.router.add_route('DELETE',  '/restaurants/{name}', delete_restaurant)
     app.cleanup_ctx.extend([database_connect])
     return app
-
