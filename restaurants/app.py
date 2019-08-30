@@ -1,6 +1,8 @@
+import os
 import json
 import functools
 from aiohttp import web
+import sqlite3
 import aiosqlite
 from jsonschema import Draft4Validator
 from jsonschema.exceptions import ValidationError
@@ -14,9 +16,14 @@ async def database_connect(app: web.Application) -> AsyncGenerator[None, None]:
     As we use an in-memory sqlite (for the sake of simplicity),
     initialisation and data-insertion is done right here
     '''
-    db = await aiosqlite.connect(":memory:")
+    db = await aiosqlite.connect(os.environ.get("SQLITE_DB", ":memory:"))
     app['db'] = db
-    await db.execute('CREATE TABLE restaurants(name VARCHAR);')
+    try:
+        await db.execute('CREATE TABLE restaurants(name VARCHAR);')
+    except sqlite3.OperationalError:
+        # already exists
+        pass
+
     yield 
     await db.close()
     
@@ -65,8 +72,8 @@ async def add_restaurant(request: web.Request, data: Dict[str, Any]={}) -> web.R
     await request.app['db'].execute(
         '''INSERT INTO restaurants(name)
            VALUES (?);''', (data['name'],))
-    
-    return web.Response(status=200)
+    await request.app['db'].commit()
+    return web.Response(status=201)
 
 
 async def list_restaurant(request: web.Request) -> web.Response:

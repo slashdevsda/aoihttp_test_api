@@ -33,7 +33,7 @@ the tests are stored into `restaurant/tests`. I used `pytest`. Into the proper p
 `restaurant/dev.py` is kind of a shorcut to start the development server as a Python module.
 
 
-## Design consideration
+## Design considerations
 
 I wanted to keep it simple, this is why I used `aiohttp`.
 
@@ -41,6 +41,11 @@ If I had to do this again, but with more relational constrains, I'll probably go
 
 I used SQLite for storage. The whole database is backed in memory. This is really fast but lacks of persistency across restarts - it spends usually a little more than 1ms to query something.
 
+By declaring an env. var named `SQLITE_DB`, we can use a file to enable persistency, eg:
+
+```
+$ export SQLITE_DB=$(pwd)/db.sqlite
+```
 
 ## What's missing in this implementation
 
